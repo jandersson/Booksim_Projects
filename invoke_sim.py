@@ -63,9 +63,14 @@ def run_simulation():
 def plot_data(data):
     xlabel = 'Offered Traffic'
     ylabel = 'Avg delay (cycles)'
-    x_vals = [x[0] for x in data]
-    y_vals = [y[1] for y in data]
-    plt.plot(x_vals, y_vals)
+    all_x = []
+    all_y = []
+    for data_set in data:
+        x_vals = [x[0] for x in data_set]
+        y_vals = [y[1] for y in data_set]
+        all_x.append(x_vals)
+        all_y.append(y_vals)
+    plt.plot(all_x[0], all_y[0], all_x[1], all_y[1], all_x[2], all_y[2], all_x[3], all_y[3])
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
     plt.show()
@@ -73,6 +78,9 @@ def plot_data(data):
 
 #Main Loop
 if __name__ == '__main__':
-    update_config('0.00', algorithm=algorithms[2])
-    data = run_simulation()
-    plot_data(data)
+    all_data = []
+    for algorithm in algorithms:
+        update_config('0.00', algorithm=algorithm)
+        data = run_simulation()
+        all_data.append(data)
+    plot_data(all_data)
