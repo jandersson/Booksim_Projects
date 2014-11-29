@@ -53,10 +53,15 @@ def run_simulation():
         data.append(data_point)
     return data
 
-#Main Loop
-if __name__ == '__main__':
-    data = run_simulation()
+
+def plot_data(data):
     x_vals = [x[0] for x in data]
     y_vals = [y[1] for y in data]
     plt.plot(x_vals, y_vals)
     plt.show()
+
+
+#Main Loop
+if __name__ == '__main__':
+    data = run_simulation()
+    plot_data(data)
