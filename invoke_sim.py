@@ -1,6 +1,6 @@
 __author__ = 'Jonas Andersson'
 
-from subprocess import call
+from subprocess import PIPE, Popen
 import re
 import fileinput
 
@@ -13,10 +13,13 @@ rates = [round(rate * 0.01, 3) for rate in range(100)]
 #Helper Functions
 def invoke():
     """
-    This function invokes the simulator.
+    This function invokes the simulator and dumps the output to a file
     :return:
     """
-    call(["booksim", config_filename])
+    with Popen(['booksim', config_filename], stdout=PIPE) as simulation:
+        with open('simulation', 'wb') as file:
+            for line in simulation.stdout:
+                file.write(line)
 
 
 def update_config(new_rate):
@@ -24,7 +27,8 @@ def update_config(new_rate):
         for line in config:
             print(inject_rate.sub('injection_rate = ' + str(new_rate) + ';', line), end='')
 
+
 #Main Loop
 if __name__ == '__main__':
-    update_config("0.15")
+    update_config("0.01")
     invoke()
