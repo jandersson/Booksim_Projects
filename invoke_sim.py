@@ -9,7 +9,9 @@ import matplotlib.pyplot as plt
 config_filename = "sim_config"
 inject_rate = re.compile(r"(?P<identifier>injection_rate)(?P<assign_op>[ =]+)(?P<value>[.0-9]+)(?P<semicolon>;)")
 avg_packet_latency = re.compile(r"(?P<identifier>Packet latency average)(?P<assign_op>[ =]+)(?P<value>[.0-9]+)")
+algorithm_re = re.compile(r"(?P<identifier>routing_function)(?P<assign_op>[ =]+)(?P<algorithm>[a-z]+)(?P<semicolon>;)")
 rates = [round(rate * 0.01, 3) for rate in range(0, 100, 5)]
+algorithms = ['dor', 'romm', 'min_adapt', 'valiant']
 
 
 #Helper Functions
@@ -38,7 +40,11 @@ def get_value():
         return latency
 
 
-def update_config(new_rate):
+def update_config(new_rate, algorithm=None):
+    if algorithm:
+        with fileinput.input(config_filename, inplace=True) as config:
+            for line in config:
+                print(algorithm_re.sub('routing_function = ' + str(algorithm) + ';', line), end='')
     with fileinput.input(config_filename, inplace=True) as config:
         for line in config:
             print(inject_rate.sub('injection_rate = ' + str(new_rate) + ';', line), end='')
@@ -55,13 +61,18 @@ def run_simulation():
 
 
 def plot_data(data):
+    xlabel = 'Offered Traffic'
+    ylabel = 'Avg delay (cycles)'
     x_vals = [x[0] for x in data]
     y_vals = [y[1] for y in data]
     plt.plot(x_vals, y_vals)
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
     plt.show()
 
 
 #Main Loop
 if __name__ == '__main__':
+    update_config('0.00', algorithm=algorithms[2])
     data = run_simulation()
     plot_data(data)

@@ -1,6 +1,6 @@
 topology = mesh;
 k = 8;
 n = 2;
-routing_function = dor;
+routing_function = min_adapt;
 traffic = uniform;
-injection_rate = 0.95;
+injection_rate = 0.45;
