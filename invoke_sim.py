@@ -26,9 +26,12 @@ def invoke():
                 if overall_stats:
                     file.write(line)
 
-def get_values():
+def get_value():
     with open('simulation', 'r') as file:
-        avg_packet_latency.findall()
+        text = file.read()
+        match = avg_packet_latency.search(text)
+        latency = match.group('value')
+        return latency
 
 def update_config(new_rate):
     with fileinput.input(config_filename, inplace=True) as config:
@@ -40,3 +43,4 @@ def update_config(new_rate):
 if __name__ == '__main__':
     update_config("0.01")
     invoke()
+    print(get_value())
