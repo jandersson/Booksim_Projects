@@ -19,13 +19,12 @@ def invoke():
     call(["booksim", config_filename])
 
 
-def update_config():
+def update_config(new_rate):
     with fileinput.input(config_filename, inplace=True) as config:
         for line in config:
-            print(inject_rate.sub('injection_rate = ' + str(rate) + ';', line), end='')
+            print(inject_rate.sub('injection_rate = ' + str(new_rate) + ';', line), end='')
 
 #Main Loop
 if __name__ == '__main__':
-    for rate in rates:
-        update_config()
-        invoke()
+    update_config("0.15")
+    invoke()
