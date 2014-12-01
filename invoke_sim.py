@@ -11,7 +11,7 @@ config_filename = "sim_config"
 inject_rate = re.compile(r"(?P<identifier>injection_rate)(?P<assign_op>[ =]+)(?P<value>[.0-9]+)(?P<semicolon>;)")
 avg_packet_latency = re.compile(r"(?P<identifier>Packet latency average)(?P<assign_op>[ =]+)(?P<value>[.0-9]+)")
 algorithm_re = re.compile(r"(?P<identifier>routing_function)(?P<assign_op>[ =]+)(?P<algorithm>[a-z_]+)(?P<semicolon>;)")
-rates = [round(rate * 0.01, 3) for rate in range(0, 100, 5)]
+rates = [round(rate * 0.01, 3) for rate in range(0, 62, 2)]
 algorithms = ['dor', 'romm', 'min_adapt', 'valiant']
 
 
