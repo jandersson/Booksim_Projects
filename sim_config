@@ -1,20 +1,19 @@
 //Topology
 topology = mesh;
-
-//Radix
 k = 8;
 n = 2;
 
+//Routing
 routing_function = valiant;
+
+//Traffic
 traffic = uniform;
-injection_rate = 0.6;
+injection_rate = 0.498;
 
 //number of flits per packet
 packet_size = 1;
 num_vcs = 16;
-vc_buf_size = 512;
-
-
+vc_buf_size = 256;
 
 injection_rate_uses_flits = 0;
 sim_type = latency;

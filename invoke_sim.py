@@ -5,13 +5,14 @@ import re
 import json
 import fileinput
 import matplotlib.pyplot as plt
+import csv
 
 #Global State
 config_filename = "sim_config"
 inject_rate = re.compile(r"(?P<identifier>injection_rate)(?P<assign_op>[ =]+)(?P<value>[.0-9]+)(?P<semicolon>;)")
 avg_packet_latency = re.compile(r"(?P<identifier>Packet latency average)(?P<assign_op>[ =]+)(?P<value>[.0-9]+)")
 algorithm_re = re.compile(r"(?P<identifier>routing_function)(?P<assign_op>[ =]+)(?P<algorithm>[a-z_]+)(?P<semicolon>;)")
-rates = [round(rate * 0.01, 3) for rate in range(0, 62, 2)]
+rates = [round(rate * 0.001, 3) for rate in range(0, 500, 2)]
 algorithms = ['dor', 'romm', 'min_adapt', 'valiant']
 
 
@@ -42,12 +43,14 @@ def update_config(new_rate, alg=None):
         print('Simulating ' + alg + ' algorithm')
         with fileinput.input(config_filename, inplace=True) as config:
             for line in config:
-                print(algorithm_re.sub('routing_function = ' + alg + ';', line), end='')
+                print(algorithm_re.sub('routing_function = ' + alg + ';', line),
+                end='')
         return
     print('Injection rate set to ' + new_rate)
     with fileinput.input(config_filename, inplace=True) as config:
         for line in config:
-            print(inject_rate.sub('injection_rate = ' + str(new_rate) + ';', line), end='')
+            print(inject_rate.sub('injection_rate = ' + str(new_rate) + ';',
+            line), end='')
     return
 
 
@@ -64,25 +67,54 @@ def run_simulation():
 def plot_data(results):
     xlabel = 'Offered Traffic'
     ylabel = 'Avg delay (cycles)'
+    title = 'Average Latency vs. Offered Load'
     for data_set in results:
         x_vals = [x[0] for x in data_set]
         y_vals = [y[1] for y in data_set]
         plt.plot(x_vals, y_vals)
+    plt.figure(1)
+    plt.title(title)
+    plt.legend(algorithms)
     plt.ylabel(ylabel)
     plt.xlabel(xlabel)
     plt.show()
 
 
-def data_file(alg, dat):
+def make_table(contents):
+    pass
+
+
+def save_data(alg, dat):
     with open(alg, 'w') as file:
         file.write(json.dumps(dat))
+    with open(alg + '.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(dat)
+
+
+def load_data():
+    all_data = []
+    for alg in algorithms:
+        with open(alg, 'r') as file:
+            text = file.read()
+            data = json.loads(text)
+            all_data.append(data)
+    return all_data
+
 
 #Main Loop
 if __name__ == '__main__':
-    all_data = []
-    for algorithm in algorithms:
-        update_config('0.00', alg=algorithm)
-        data = run_simulation()
-        all_data.append(data)
-        data_file(algorithm, data)
-    plot_data(all_data)
+    simulate = True
+    load_previous = False
+    if simulate:
+        all_data = []
+        for algorithm in algorithms:
+            update_config('0.00', alg=algorithm)
+            data = run_simulation()
+            all_data.append(data)
+            save_data(algorithm, data)
+        plot_data(all_data)
+    if load_previous:
+        all_data = load_data()
+        plot_data(all_data)
+        make_table(all_data)
