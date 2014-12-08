@@ -12,6 +12,9 @@ config_filename = "sim_config"
 inject_rate = re.compile(r"(?P<identifier>injection_rate)(?P<assign_op>[ =]+)(?P<value>[.0-9]+)(?P<semicolon>;)")
 avg_packet_latency = re.compile(r"(?P<identifier>Packet latency average)(?P<assign_op>[ =]+)(?P<value>[.0-9]+)")
 algorithm_re = re.compile(r"(?P<identifier>routing_function)(?P<assign_op>[ =]+)(?P<algorithm>[a-z_]+)(?P<semicolon>;)")
+num_vcs_re = re.compile(r"(?P<identifier>num_vcs)(?P<assign_op>[ =]+)(?P<value>[0-9]+)(?P<semicolon>;)")
+allocator_re = re.compile(r"(?P<identifier>)")
+
 rates = [round(rate * 0.001, 3) for rate in range(0, 500, 2)]
 algorithms = ['dor', 'romm', 'min_adapt', 'valiant']
 
@@ -38,19 +41,28 @@ def get_value():
         return latency
 
 
-def update_config(new_rate, alg=None):
+def update_config(new_rate, alg=None, vc_num=None, alloc=None):
+    if alloc:
+        print('Allocation set to ' + alloc)
+        with fileinput.input(config_filename, inplace=True) as config:
+            for line in config:
+                print(allocator_re.sub('vc_allocator = ' + alloc + ';', line), end='')
+    if vc_num:
+        print('Setting number of virtual channels to: ' + vc_num)
+        with fileinput.input(config_filename, inplace=True) as config:
+            for line in config:
+                print(num_vcs_re.sub('num_vcs = ' + vc_num + ';', line), end='')
+
     if alg:
         print('Simulating ' + alg + ' algorithm')
         with fileinput.input(config_filename, inplace=True) as config:
             for line in config:
-                print(algorithm_re.sub('routing_function = ' + alg + ';', line),
-                end='')
+                print(algorithm_re.sub('routing_function = ' + alg + ';', line), end='')
         return
     print('Injection rate set to ' + new_rate)
     with fileinput.input(config_filename, inplace=True) as config:
         for line in config:
-            print(inject_rate.sub('injection_rate = ' + str(new_rate) + ';',
-            line), end='')
+            print(inject_rate.sub('injection_rate = ' + str(new_rate) + ';', line), end='')
     return
 
 
