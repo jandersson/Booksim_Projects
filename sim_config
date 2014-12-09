@@ -4,16 +4,22 @@ k = 16;
 n = 2;
 
 //Routing
-routing_function = valiant;
+routing_function = dim_order;
 
 //Traffic
-traffic = uniform;
+traffic = neighbor;
 injection_rate = 0.498;
+
+//Switch
+sw_allocator = separable_input_first;
 
 //number of flits per packet
 packet_size = 1;
+
+//Virtual Channels
 num_vcs = 16;
-vc_buf_size = 256;
+vc_buf_size = 8;
+vc_allocator = separable_input_first;
 
 injection_rate_uses_flits = 0;
 sim_type = latency;
